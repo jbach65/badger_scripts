@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import requests
+import socket
+from socket import AF_INET, SOCK_DGRAM
 from argparse import ArgumentParser
 from multiprocessing import Process, Queue, freeze_support
 from os.path import expanduser
@@ -111,11 +113,17 @@ def run_script(bot, args):
 
     except SSHException as e:
         print("Failed: {}".format(e))
-        return
+        output.append("SSH Exception")
+        return output
+
+    except socket.timeout as e:
+        print("Timeout error: {}".format(e))
+        output.append("Socket timeout")
+        return output
 
     finally:
-        #con.close()
-        print("")
+        con.close()
+        #print("")
 
 
 if __name__ == '__main__':
@@ -133,11 +141,10 @@ if __name__ == '__main__':
 
 
     #print(log_pe_issue("BAR813", "SUMMARY GOES HERE", "This is a description"))
-    pprint(STORES[BOTS['BAR144']['store_id']])
+    #pprint(STORES[BOTS['BAR144']['store_id']])
     results = []
     print(datetime.datetime.now())
     for bot in bot_list:
         result = run_script(bot, args)
-        for line in result:
-            pprint(line)
+        pprint(result)
         print("")
