@@ -1,3 +1,5 @@
+# TODO: figure out why I need sys.path.append
+
 import sys
 import time
 import argparse
@@ -44,20 +46,35 @@ class ListAction(argparse.Action):
 def open_things(args, vpn_list):
     for vpn in vpn_list:
         fleetObj = FleetApiController("bar"+str(vpn), args.env)
-        print("Opening vpn on BAR%r" % (vpn))
+        print("Opening vpn on BAR{}".format(vpn))
         if vpn_check(fleetObj):
             print('VPN open')
             print("Getting IP from Fleet command history")
             command_line = get_vpn_opened_line(fleetObj)
-            IP = parse_vpn_line(str(command_line['result']))
-            print("IP: " + IP)
+            IP = ""
+            if command_line != "":
+                IP = parse_vpn_line(str(command_line['result']))
             if IP != "":
+                print("IP: " + IP)
                 print("Generating hosts file string...")
                 hostsLine = generate_hostfile_string(IP,'bar'+str(vpn),fleetObj.robot_serial)
                 print("Writing this line hosts file: " + hostsLine)
                 write_to_hosts(args.hosts,hostsLine)
             else:
-                print("Open VPN command not found in bar"+ vpn + "\'s command history\nUnable to complete")
+                print("Open VPN command not found in bar"+ vpn + "\'s command history\nSending OpenVPN command")
+                fleetObj.open_vpn()
+                print("Waiting on IP...")
+                fleet_result = wait_for_IP(fleetObj)
+                IP = parse_vpn_line(str(fleet_result))
+                if IP == "":
+                    print("ERROR: Unable to reserve VPN connection")
+                else:
+                    print("IP: " + IP)
+                    print("Generating hosts file string...")
+                    hostsLine = generate_hostfile_string(IP,'bar'+str(vpn),fleetObj.robot_serial)
+                    print("Writing this line hosts file: " + hostsLine)
+                    write_to_hosts(args.hosts,hostsLine)
+
         else:
             print('VPN closed')
             print("Sending Open VPN command to fleet")
@@ -110,13 +127,9 @@ def get_vpn_opened_line(fleet):
     cmd_list = fleet.get_command_history(1).json()
     cmd_list_sorted = sorted(cmd_list, key=lambda k: k['created_at'], reverse=True)
     for cmd in cmd_list_sorted:
-        if cmd['command_type'] == "close_vpn":
-            return "vpn was closed at %r" % (cmd['finished_at'])
-        elif cmd['command_type'] == "power_control":
-            return "bot was power-cycled at %r" % (cmd['finished_at'])
-        elif cmd['command_type'] == "open_vpn":
+        if cmd['command_type'] == "open_vpn":
             return cmd
-    return "no open vpn command found"
+    return ""
 
 def parse_vpn_line(vpn_line):
     split = vpn_line.split(" ")
@@ -159,13 +172,14 @@ def wait_for_IP(fleet):
     cmd_list = fleet.get_command_history(1).json()
     cmd_list_sorted = sorted(cmd_list, key=lambda k: k['created_at'], reverse=True)
     checks = 0
-    while checks <= 100:
+    while checks <= 180:
         cmd_index = 0
         while cmd_list_sorted[cmd_index]['command_type'] != "open_vpn":
             cmd_index+=1
         if cmd_list_sorted[cmd_index]['result'] is not None:
             return cmd_list_sorted[cmd_index]['result']
         checks+=1
+        time.sleep(2)
         cmd_list = fleet.get_command_history(1).json()
         cmd_list_sorted = sorted(cmd_list, key=lambda k: k['created_at'], reverse=True)
 
@@ -184,7 +198,6 @@ def get_hosts_bot_list(hostsFilePath):
 
 parser = argparse.ArgumentParser(description='A script for all your PE VPN needs')
 parser.add_argument('--env', default='PRODUCTION', help='fleet environment')
-#parser.add_argument('--auth', default='/home/jsbach/GitHub/badger_pylibs/api_controllers/api_controllers/creds', help='fleet credential file location')
 parser.add_argument('--hosts', default='/etc/hosts')
 parser.add_argument('-o', '--open', nargs='+', type=int, help='bot # you want to open VPN on (if multiple, separate with spaces)', action=OpenAction)
 parser.add_argument('-c', '--close', nargs='+', type=int, help='bot # you want to close VPN on (if multiple, separate with spaces)', action=CloseAction)
@@ -192,3 +205,4 @@ parser.add_argument('-r', '--remove', nargs='+', type=int, help='bot # you want 
 parser.add_argument('-l', '--list', nargs=0 , help='list all VPN connections in hosts file', action=ListAction)
 parser.add_argument('-v', '--verify', nargs=0 , help='verify all VPN connections in hosts file', action=VerifyAction)
 args = parser.parse_args()
+
