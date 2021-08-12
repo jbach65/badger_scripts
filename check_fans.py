@@ -27,6 +27,8 @@ JAMIE = '<@UDKLJFK3L>'
 
 # TODO: only check payload if robot is certain solution
 # TODO: add data to sharepoint
+# TODO: read fleet creds from file in .fleetapi
+# TODO: remove webhooks and put them somewhere else
 
 #convert from bytes for more readable output
 def decode_output_list(lst):
