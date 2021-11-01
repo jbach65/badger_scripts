@@ -1,3 +1,6 @@
+# TODO: format output
+# TODO: add log files
+
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser, FileType
@@ -30,8 +33,8 @@ def add_files(con, args):
     for file in args.add:
         output.append("-- Transferring {} to /home/bar/pe/ --".format(get_file_name_from_path(file)))
         con.transfer_file_upload(file,"/home/bar/pe/")
-        output.append("-- Moving {} to {} --".format(get_file_name_from_path(file), map_folder(args.folder)))
-        con.exec_command("sudo cp /home/bar/pe/{} {}".format(get_file_name_from_path(file), map_folder(args.folder)))
+        output.append("-- Moving {} to {} --".format(get_file_name_from_path(file), map_folder(args.Folder)))
+        con.exec_command("sudo cp /home/bar/pe/{} {}".format(get_file_name_from_path(file), map_folder(args.Folder)))
     return output
 
 def disable_files(con, args):
@@ -203,8 +206,6 @@ if __name__ == '__main__':
         for line in args.fileList:
             bot_list.append(line.strip())
 
-    pprint(bot_list)
-    pprint(args)
     for bot in bot_list:
         print(bot)
         for line in run_script(bot, args):

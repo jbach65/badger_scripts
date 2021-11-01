@@ -14,9 +14,9 @@ from time import sleep
 from pprint import pprint
 import datetime
 
-SR_TEST_URL = 'https://hooks.slack.com/services/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'
-WOODMANS_URL = 'https://hooks.slack.com/services/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'
-WOOLWORTHS_URL = 'https://hooks.slack.com/services/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'
+SR_TEST_URL = 'https://hooks.slack.com/services/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'
+WOODMANS_URL = 'https://hooks.slack.FAKE.com/services/T3PBYKHC4/B029CCY7DAP/GFBzmdBKY7CmNZVR2Zu72mte'
+WOOLWORTHS_URL = 'https://hooks.slack.FAKE.com/services/T3PBYKHC4/B029QRY0P89/2tmA6vBempYmkSjju22tXbgn'
 FLEETURL = 'https://fleet.badger-technologies.com/api/web/v1/'
 FLEETUSR = 'josh_steinbach@jabil.com'
 FLEETPASS = '#JSBach4171997'
@@ -182,6 +182,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--report', help='automatically report to apprepriate slack channel if truck fan speed is 0', action='store_true')
     args = parser.parse_args()
 
+#    need this only if jira is to be implemented
 #    botRequest = requests.get(FLEETURL+'robots', auth=(FLEETUSR, FLEETPASS))
 #    botsJson = botRequest.json()
 #    BOTS = {}

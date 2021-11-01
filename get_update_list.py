@@ -1,3 +1,5 @@
+# TODO: add the following as command line arguments for more flexibility: organization, solution, acceptable lifecycle state
+
 import requests
 import json
 import argparse
@@ -7,9 +9,7 @@ from os.path import expanduser
 
 
 FLEETURL = 'https://fleet.badger-technologies.com/api/web/v1/'
-#FLEETUSR = 'josh_steinbach@jabil.com'
-#FLEETPASS = '#JSBach4171997'
-#MAX = 100
+
 
 def get_version(bot, user, password):
     try:
@@ -80,8 +80,8 @@ def generate_list(args):
         #print(bot['lifecycle_state'])
         if count < args.max_number:
             #if bot['lifecycle_state'].lower() in ('hold_for_service', 'store_hold'):
-            if bot['lifecycle_state'].lower() not in ('first_week', 'manufacturing', 'pre_install', 'install', 'service', 'maintenance', 'depot', 'internal_test', 'retired'):
-            #if bot['lifecycle_state'].lower() not in ('first_week', 'manufacturing', 'pre_install', 'install', 'hold_for_service', 'service', 'maintenance', 'store_hold', 'depot', 'internal_test', 'retired'):
+            #if bot['lifecycle_state'].lower() not in ('first_week', 'manufacturing', 'pre_install', 'install', 'service', 'maintenance', 'depot', 'internal_test', 'retired'):
+            if bot['lifecycle_state'].lower() not in ('first_week', 'manufacturing', 'pre_install', 'install', 'hold_for_service', 'service', 'maintenance', 'store_hold', 'depot', 'internal_test', 'retired'):
                 if get_organzation(stores[bot['store_id']]) == "Ahold":
                     if bot['solution'] == 'inspect':
                         version = get_version(bot, fleet_user, fleet_pass)
