@@ -52,24 +52,50 @@ def disable_files(con, args):
                 con.exec_command("sudo mv /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/{} /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/{}.DISABLED".format(get_file_name_from_path(file), get_file_name_from_path(file)))
             else:
                 output.append("-- {} NOT FOUND in /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/ --".format(get_file_name_from_path(file)))
+
+        output.append("-- Locating {} --".format(get_file_name_from_path(file)))
+        if check_folder(con, file, "/var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/"):
+            output.append("-- {} found in /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/ --".format(get_file_name_from_path(file)))
+            output.append("-- Disabling {} --".format(get_file_name_from_path(file)))
+            con.exec_command("sudo mv /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/{} /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/{}.DISABLED".format(get_file_name_from_path(file), get_file_name_from_path(file)))
+            output.append("-- File has been Disabled --".format(get_file_name_from_path(file)))
+        elif check_folder(con, file, "/var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/"):
+            output.append("-- {} found in /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/ --".format(get_file_name_from_path(file)))
+            output.append("-- Disabling {} --".format(get_file_name_from_path(file)))
+            con.exec_command("sudo mv /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/{} /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/{}.DISABLED".format(get_file_name_from_path(file), get_file_name_from_path(file)))
+            output.append("-- File has been Disabled --".format(get_file_name_from_path(file)))
+        elif check_folder(con, file, "/var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides/"):
+            output.append("-- {} found in /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides/ --".format(get_file_name_from_path(file)))
+            output.append("-- Disabling {} --".format(get_file_name_from_path(file)))
+            con.exec_command("sudo mv /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/{} /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides/{}.DISABLED".format(get_file_name_from_path(file), get_file_name_from_path(file)))
+            output.append("-- File has been Disabled --".format(get_file_name_from_path(file)))
+        else:
+            output.append("-- {} not found in any of the override directories --".format(get_file_name_from_path(file)))
     return output
 
 
 def remove_files(con, args):
     output = []
     for file in args.remove:
-        output.append("-- Checking for {} in /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/ --".format(get_file_name_from_path(file)))
+        output.append("-- Locating {} --".format(get_file_name_from_path(file)))
         if check_folder(con, file, "/var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/"):
+            output.append("-- {} found in /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/ --".format(get_file_name_from_path(file)))
             output.append("-- Removing {} --".format(get_file_name_from_path(file)))
             con.exec_command("sudo rm /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/{}".format(get_file_name_from_path(file)))
+            output.append("-- File Removed --".format(get_file_name_from_path(file)))
+        elif check_folder(con, file, "/var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/"):
+            output.append("-- {} found in /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/ --".format(get_file_name_from_path(file)))
+            output.append("-- Removing {} --".format(get_file_name_from_path(file)))
+            con.exec_command("sudo rm /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/{}".format(get_file_name_from_path(file)))
+            output.append("-- File Removed --".format(get_file_name_from_path(file)))
+        elif check_folder(con, file, "/var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides/"):
+            output.append("-- {} found in /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides/ --".format(get_file_name_from_path(file)))
+            output.append("-- Removing {} --".format(get_file_name_from_path(file)))
+            con.exec_command("sudo rm /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides/{}".format(get_file_name_from_path(file)))
+            output.append("-- File Removed --".format(get_file_name_from_path(file)))
         else:
-            output.append("-- {} NOT FOUND in /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/ --".format(get_file_name_from_path(file)))
-            output.append("-- Checking for {} in /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/ --".format(get_file_name_from_path(file)))
-            if check_folder(con, file, "/var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/"):
-                output.append("-- Removing {} --".format(get_file_name_from_path(file)))
-                con.exec_command("sudo rm /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/{}".format(get_file_name_from_path(file)))
-            else:
-                output.append("-- {} NOT FOUND in /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/ --".format(get_file_name_from_path(file)))
+            output.append("-- {} not found in any of the override directories --".format(get_file_name_from_path(file)))
+
     return output
 
 def map_folder(folder):
@@ -77,9 +103,12 @@ def map_folder(folder):
         return "/var/snap/bar-base/current/config/salt-master/srv/pillar/fleet/"
     elif folder == "overrides":
         return "/var/snap/bar-base/current/config/salt-master/srv/pillar/overrides/"
+    elif folder == "pe-overrides":
+        return "/var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides/"
     else:
         return ""
 
+#checks a directory for the presence of a file
 def check_folder(con, file, folder):
     fleet_check = con.exec_command("ls {}{}".format(folder, file))
     if len(fleet_check) == 1:
@@ -94,6 +123,8 @@ def commands(con, args):
         output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet")))
         output.append("-- overrides directory contents: --")
         output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides")))
+        output.append("-- pe-overrides directory contents: --")
+        output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides")))
 
     if args.params != None:
         output.append("-- Params BEFORE salt changes applied --")
@@ -116,11 +147,13 @@ def commands(con, args):
             output.append(line)
 
     if args.add != None or args.remove != None or args.disable != None:
-        output.append("-- fleet directory contents after salt update: --")
+        output.append("-- fleet directory contents after changes: --")
         output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet")))
         output.append("-- overrides directory contents after salt update: --")
         output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides")))
-        output.append("-- Applying salt changes --")
+        output.append("-- pe-overrides directory contents: --")
+        output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides")))
+        output.append("-- Applying salt --")
         output.append(decode_output(con.exec_command("sudo bar-base.salt '*' state.apply")))
         if args.params != None:
             output.append("-- Params AFTER salt changes applied --")
@@ -183,7 +216,7 @@ if __name__ == '__main__':
     list_options = parser.add_mutually_exclusive_group()
     list_options.add_argument('-l', '--list',
                         nargs="*",
-                        help="list of robots to update. Format: A B C")
+                        help="list of robots to update. Format: BARXXX BARYYY BARZZZ")
     list_options.add_argument('-f', '--fileList',
                         type=FileType('r'),
                         help="File containing the list of robots to update")
@@ -192,7 +225,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--disable", nargs='+', help="salt override(s) to disable")
     parser.add_argument("-r", "--remove", nargs='+', help="salt override(s) to remove")
     parser.add_argument("-p", "--params", nargs='+', help="rosparam(s) to check before and after applying salt changes")
-    parser.add_argument("-F", "--Folder", choices={'fleet', 'overrides'}, default="fleet", help='directory where you want the override to live')
+    parser.add_argument("-F", "--Folder", choices={'fleet', 'overrides', 'pe-overrides'}, default="fleet", help='directory where you want the override to live')
     parser.add_argument("--dont_apply_changes", help="if you want to add an override but not apply salt changes", action="store_false")
     parser.add_argument('--ssh_key', default=expanduser("~/.ssh/barkey"), help='SSH key file EX: /home/jsbach/.ssh/barkey')
     parser.add_argument('--env', default="PRODUCTION", help='Current Env of bot')
