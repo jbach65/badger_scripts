@@ -25,9 +25,9 @@ def get_version(bot, user, password):
 def get_organzation(store):
     if store['organization_id'] == 1:
         return "Ahold"
-    elif store['organization_id'] == 25:
-        return "Woolworths"
     elif store['organization_id'] == 4:
+        return "Woolworths"
+    elif store['organization_id'] == 25:
         return "Woodmans"
     else:
         return "Other"
