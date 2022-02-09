@@ -120,11 +120,11 @@ def commands(con, args):
     output = []
     if args.show:
         output.append("-- fleet directory contents: --")
-        output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet")))
+        output.append(decode_output(con.exec_command("ls -l /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet")))
         output.append("-- overrides directory contents: --")
-        output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides")))
+        output.append(decode_output(con.exec_command("ls -l /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides")))
         output.append("-- pe-overrides directory contents: --")
-        output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides")))
+        output.append(decode_output(con.exec_command("ls -l /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides")))
 
     if args.params != None:
         output.append("-- Params BEFORE salt changes applied --")
@@ -148,11 +148,11 @@ def commands(con, args):
 
     if args.add != None or args.remove != None or args.disable != None:
         output.append("-- fleet directory contents after changes: --")
-        output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet")))
+        output.append(decode_output(con.exec_command("ls -l /var/snap/bar-base/current/config/salt-master/srv/pillar/fleet")))
         output.append("-- overrides directory contents after salt update: --")
-        output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides")))
+        output.append(decode_output(con.exec_command("ls -l /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides")))
         output.append("-- pe-overrides directory contents: --")
-        output.append(decode_output(con.exec_command("ls -al /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides")))
+        output.append(decode_output(con.exec_command("ls -l /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides")))
         output.append("-- Applying salt --")
         output.append(decode_output(con.exec_command("sudo bar-base.salt '*' state.apply")))
         if args.params != None:
@@ -220,7 +220,7 @@ if __name__ == '__main__':
     list_options.add_argument('-f', '--fileList',
                         type=FileType('r'),
                         help="File containing the list of robots to update")
-    parser.add_argument('-s', '--show', help='show contents of fleet and override directories', action='store_true')
+    parser.add_argument('-s', '--show', help='show contents of fleet, overrides, and pe_overrides directories', action='store_true')
     parser.add_argument("-a", "--add", nargs='+', help="salt override(s) to add")
     parser.add_argument("-d", "--disable", nargs='+', help="salt override(s) to disable")
     parser.add_argument("-r", "--remove", nargs='+', help="salt override(s) to remove")
