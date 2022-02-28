@@ -42,6 +42,17 @@ class ListAction(argparse.Action):
         for bot in get_hosts_bot_list(namespace.hosts):
             print(bot)
 
+class TidyAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values)
+        for bot in get_hosts_bot_list(namespace.hosts):
+            fleetObj = FleetApiController(bot, namespace.env)
+            if not vpn_check(fleetObj):
+                if remove_from_hosts(namespace.hosts,bot):
+                    print("BAR" + str(bot[3:]) + " removed from " + namespace.hosts)
+                else:
+                    print("ERROR: BAR" + str(bot[3:]) + " not found in " + namespace.hosts)
+
 
 def open_things(args, vpn_list):
     for vpn in vpn_list:
@@ -204,5 +215,5 @@ parser.add_argument('-c', '--close', nargs='+', type=int, help='bot # you want t
 parser.add_argument('-r', '--remove', nargs='+', type=int, help='bot # you want to remove from hosts file (if multiple, separate with spaces)', action=RemoveAction)
 parser.add_argument('-l', '--list', nargs=0 , help='list all VPN connections in hosts file', action=ListAction)
 parser.add_argument('-v', '--verify', nargs=0 , help='verify all VPN connections in hosts file', action=VerifyAction)
+parser.add_argument('-t', '--tidy', nargs=0 , help='tidy up all VPN connections in hosts file by clearing out all closed connections', action=TidyAction)
 args = parser.parse_args()
-
