@@ -135,9 +135,6 @@ if __name__ == '__main__':
     subprocess.Popen(['mkdir', '-p', args.directory], stdout=subprocess.PIPE,  stderr=subprocess.STDOUT)
     subprocess.Popen(['mkdir', '-p', args.normalized], stdout=subprocess.PIPE,  stderr=subprocess.STDOUT)
 
-    print(args.directory)
-    print(args.normalized)
-
     #grab all of the calibration files already present to make sure we dont get duplicates (aids in stopping and re-starting long lists right where you left off)
     result = subprocess.Popen(['ls', args.directory], stdout=subprocess.PIPE,  stderr=subprocess.STDOUT)
     stdout,stderr = result.communicate()
