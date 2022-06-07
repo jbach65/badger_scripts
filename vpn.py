@@ -72,7 +72,7 @@ def open_things(args, vpn_list):
                 print("Writing this line hosts file: " + hostsLine)
                 write_to_hosts(args.hosts,hostsLine)
             else:
-                print("Open VPN command not found in bar"+ vpn + "\'s command history\nSending OpenVPN command")
+                print("Open VPN command not found in bar"+ str(vpn) + "\'s command history\nSending OpenVPN command")
                 fleetObj.open_vpn()
                 print("Waiting on IP...")
                 fleet_result = wait_for_IP(fleetObj)
