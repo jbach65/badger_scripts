@@ -78,9 +78,9 @@ def generate_list(args):
     if args.verbose:
         print("Pulling list of organizations...")
     orgs = pull_organizations()
-#    if args.verbose:
-#        print("Pulling list of robot models...")
-#    models = pull_models()
+    if args.verbose:
+        print("Pulling list of robot models...")
+    models = pull_models()
 
     if args.verbose:
         print("Beginning robot filtering...")
@@ -88,10 +88,11 @@ def generate_list(args):
     list = []
     count = 0
     for bot in bots:
-        if count < int(args.max):
+        if count < int(args.number):
             org_check = args.organization.lower() in orgs[stores[bot['store_id']]['organization_id']]['name'].lower()
             lifecycle_check = bot['lifecycle_state'] in ['fully_operational', 'hold_for_service', 'store_hold', 'level_3_support']
-            if org_check and lifecycle_check:
+            model_check = ( args.model == -1 or args.model == bot['robot_model_id'] )
+            if org_check and lifecycle_check and model_check:
                 version = get_version(bot, FLEET_USER, FLEET_PASS)
                 version_check = args.release in version
                 if version_check != args.exclude:
@@ -119,12 +120,14 @@ parser.add_argument('-w', '--write', default='~/bots', help='file to write list 
 parser.add_argument('-v', '--verbose', help='verbose output', action='store_true')
 parser.add_argument('-s', '--shuffle', help='shuffle list of bots from fleet to promote random rollout', action='store_true')
 parser.add_argument('-e', '--exclude', help='if present bot will only select all bots NOT on the provided release', action='store_true')
-parser.add_argument('-m', '--max', help='max bots', default = "100")
+parser.add_argument('-n', '--number', help='max number of bots', default = "100")
 parser.add_argument('-r', '--release', default='1.24', help='release you are looking for(unless exclude-version flag is present) (ex. 1.19.6 or just 1.19)')
 parser.add_argument("-o", "--organization", choices={'Woodmans', 'Woolworths', 'Ahold'}, default="Ahold", help='organization')
+parser.add_argument("-m", "--model", type=int,  default="-1", help='robot model number (3 for Inspect PVT) (-1 for all models)')
 #may implement list flag so we can see all possible options for models and orgs, not necessary yet though
 #parser.add_argument('-l', '--list', nargs=0 , help='list all model and org options', action=ListAction)
 args = parser.parse_args()
+
 
 FLEET_USER, FLEET_PASS = get_creds(args.creds)
 list = generate_list(args)
