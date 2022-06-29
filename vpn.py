@@ -5,6 +5,9 @@ import time
 import argparse
 from pprint import pprint
 
+#See user_lookup function (use -1 to disable feature)
+CURRENT_USER = 636
+
 sys.path.append('/home/jsbach/Documents')
 from badger_pylibs.api_controllers.api_controllers.fleet_api_controller import FleetApiController
 
@@ -67,10 +70,15 @@ def open_things(args, vpn_list):
                 IP = parse_vpn_line(str(command_line['result']))
             if IP != "":
                 print("IP: " + IP)
+                fleetObj.open_vpn()
                 print("Generating hosts file string...")
                 hostsLine = generate_hostfile_string(IP,'bar'+str(vpn),fleetObj.robot_serial)
                 print("Writing this line hosts file: " + hostsLine)
+                opener_id = command_line['created_by_id']
+                if opener_id != CURRENT_USER and opener_id != -1:
+                    print(f"NOTE: VPN opened by {user_lookup(opener_id)} at {command_line['created_at']}")
                 write_to_hosts(args.hosts,hostsLine)
+
             else:
                 print("Open VPN command not found in bar"+ str(vpn) + "\'s command history\nSending OpenVPN command")
                 fleetObj.open_vpn()
@@ -106,13 +114,22 @@ def close_things(args, vpn_list):
     for vpn in vpn_list:
         fleetObj = FleetApiController("bar"+str(vpn), args.env)
         print("Closing vpn on bar%r" % (vpn))
-        print("Sending Close VPN command to fleet")
-        fleetObj.close_vpn()
-        print("Removing line from hosts file")
-        if remove_from_hosts(args.hosts,'bar'+str(vpn)):
-            print("BAR" + str(vpn) + " removed from " + args.hosts)
-        else:
-            print("ERROR: BAR" + str(vpn) + " not found in " + args.hosts)
+        double_check = True
+        command_line = get_vpn_opened_line(fleetObj)
+        last_opener_id = 0
+        if command_line != "":
+            last_opener_id = command_line['created_by_id']
+        if last_opener_id != CURRENT_USER and CURRENT_USER != -1 and vpn_check(fleetObj):
+            print(f"WARNING: VPN opened by {user_lookup(last_opener_id)} at {command_line['created_at']}")
+            double_check = yes_or_no("Are you sure you want to close the VPN?")
+        if double_check:
+            print("Sending Close VPN command to fleet")
+            fleetObj.close_vpn()
+            print("Removing line from hosts file")
+            if remove_from_hosts(args.hosts,'bar'+str(vpn)):
+                print("BAR" + str(vpn) + " removed from " + args.hosts)
+            else:
+                print("ERROR: BAR" + str(vpn) + " not found in " + args.hosts)
 
 def remove_things(args, vpn_list):
     for vpn in vpn_list:
@@ -121,6 +138,30 @@ def remove_things(args, vpn_list):
             print("BAR" + str(vpn) + " removed from " + args.hosts)
         else:
             print("ERROR: BAR" + str(vpn) + " not found in " + args.hosts)
+
+def yes_or_no(question):
+    reply = str(input(question+' (y/n): ')).lower().strip()
+    if reply[0] == 'y':
+        return True
+    if reply[0] == 'n':
+        return False
+    else:
+        return yes_or_no("Uhhhh... please enter ")
+
+def user_lookup(id):
+    users = {
+        636: "Josh S",
+        607: "Josh C",
+        406: "Aria S",
+        113: "Jeff N",
+        808: "Antonio H",
+        401: "Joy C",
+        807: "Hippo C"
+    }
+    if id in users.keys():
+        return users[id]
+    else:
+        return "Unknown User"
 
 def vpn_check(fleet):
     latest_heartbeat = fleet.get_latest_heartbeat().json()

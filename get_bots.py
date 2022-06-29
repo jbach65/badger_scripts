@@ -122,7 +122,7 @@ parser.add_argument('-s', '--shuffle', help='shuffle list of bots from fleet to 
 parser.add_argument('-e', '--exclude', help='if present bot will only select all bots NOT on the provided release', action='store_true')
 parser.add_argument('-n', '--number', help='max number of bots', default = "100")
 parser.add_argument('-r', '--release', default='1.24', help='release you are looking for(unless exclude-version flag is present) (ex. 1.19.6 or just 1.19)')
-parser.add_argument("-o", "--organization", choices={'Woodmans', 'Woolworths', 'Ahold'}, default="Ahold", help='organization')
+parser.add_argument("-o", "--organization", choices={'Woodman', 'Woolworth', 'Ahold'}, default="Ahold", help='organization')
 parser.add_argument("-m", "--model", type=int,  default="-1", help='robot model number (3 for Inspect PVT) (-1 for all models)')
 #may implement list flag so we can see all possible options for models and orgs, not necessary yet though
 #parser.add_argument('-l', '--list', nargs=0 , help='list all model and org options', action=ListAction)
