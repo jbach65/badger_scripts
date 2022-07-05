@@ -5,8 +5,8 @@ import time
 import argparse
 from pprint import pprint
 
-#See user_lookup function (use -1 to disable feature)
-CURRENT_USER = 636
+#See user_lookup function (use -1 to disable feature) (636 for me)
+CURRENT_USER = -1
 
 sys.path.append('/home/jsbach/Documents')
 from badger_pylibs.api_controllers.api_controllers.fleet_api_controller import FleetApiController

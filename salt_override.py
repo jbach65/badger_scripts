@@ -153,12 +153,13 @@ def commands(con, args):
         output.append(decode_output(con.exec_command("ls -l /var/snap/bar-base/current/config/salt-master/srv/pillar/overrides")))
         output.append("-- pe-overrides directory contents: --")
         output.append(decode_output(con.exec_command("ls -l /var/snap/bar-base/current/config/salt-master/srv/pillar/pe-overrides")))
-        output.append("-- Applying salt --")
-        output.append(decode_output(con.exec_command("sudo bar-base.salt '*' state.apply")))
-        if args.params != None:
-            output.append("-- Params AFTER salt changes applied --")
-            for param in args.params:
-                output.append("{}: {}".format(param, decode_output(con.exec_command("bar-base.bash -c \"rosparam get -p {}\"".format(param)))))
+        if args.dont_apply_changes:
+            output.append("-- Applying salt --")
+            output.append(decode_output(con.exec_command("sudo bar-base.salt '*' state.apply")))
+            if args.params != None:
+                output.append("-- Params AFTER salt changes applied --")
+                for param in args.params:
+                    output.append("{}: {}".format(param, decode_output(con.exec_command("bar-base.bash -c \"rosparam get -p {}\"".format(param)))))
     output.append("-- Done --")
     return output
 
